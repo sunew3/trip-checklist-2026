@@ -114,7 +114,7 @@
     letter-spacing: -0.01em;
     text-wrap: balance;
     word-break: keep-all;
-    padding-right: 50px;
+    padding-right: 68px;
   }
   .sub {
     margin: 0;
@@ -509,10 +509,16 @@
   .linkout-btn:hover { filter: brightness(1.05); }
   .linkout-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .theme-toggle {
+  .theme-wrap {
     position: absolute;
     top: 4px;
     right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .theme-toggle {
     width: 42px;
     height: 42px;
     border-radius: 999px;
@@ -526,6 +532,12 @@
     padding: 0;
   }
   .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .theme-label {
+    font-size: 0.62rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
 
   .roles-img { display:block; width:100%; height:auto; border-radius:10px; border:1px solid var(--line); cursor: zoom-in; }
   .roles-hint { text-align:center; font-size:0.75rem; color: var(--ink-faint); margin-top: 8px; }
@@ -555,7 +567,10 @@
 
 <div class="app">
   <div class="masthead">
-    <button type="button" class="theme-toggle" id="themeToggle" aria-label="다크 모드로 전환">🌙</button>
+    <div class="theme-wrap">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="다크 모드로 전환">🌙</button>
+      <span class="theme-label" id="themeLabel">dark mode</span>
+    </div>
     <span class="eyebrow">✈️ 2026년 제27차 동북아 역사기행</span>
     <h1>민족의 뿌리를 찾아서 — 준비 체크리스트</h1>
     <p class="sub">8/8(토) 인천 출발 — 8/14(금) 인천 도착 · 6박 7일</p>
@@ -775,11 +790,25 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
+    // localStorage가 비어 있으면 쿠키 백업에서 복원
+    try {
+      var m = document.cookie.match(new RegExp("(?:^|; )" + STORAGE_KEY + "=([^;]*)"));
+      if (m) return JSON.parse(decodeURIComponent(m[1]));
+    } catch (e) {}
     return { bus: "", group: "", name: "", checked: {} };
   }
   function saveState() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    var json = JSON.stringify(state);
+    try { localStorage.setItem(STORAGE_KEY, json); } catch (e) {}
+    // 쿠키에도 백업 (1년 유지)
+    try {
+      document.cookie = STORAGE_KEY + "=" + encodeURIComponent(json) + "; max-age=31536000; path=/; SameSite=Lax";
+    } catch (e) {}
   }
+  // 브라우저에 영구 저장을 요청 — iOS 사파리의 '7일 미접속 시 저장소 삭제' 방지
+  try {
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
+  } catch (e) {}
 
   function allItemIds() {
     var ids = data.pre.items.map(function (i) { return i.id; });
@@ -950,14 +979,17 @@
   // 다크/라이트 테마 전환 (선택은 이 기기에 저장)
   var THEME_KEY = "nk-trip-theme";
   var themeBtn = document.getElementById("themeToggle");
+  var themeLabel = document.getElementById("themeLabel");
   function effectiveDark() {
     var t = document.documentElement.getAttribute("data-theme");
     if (t) return t === "dark";
     return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
   function refreshThemeBtn() {
-    themeBtn.textContent = effectiveDark() ? "☀️" : "🌙";
-    themeBtn.setAttribute("aria-label", effectiveDark() ? "라이트 모드로 전환" : "다크 모드로 전환");
+    var dark = effectiveDark();
+    themeBtn.textContent = dark ? "☀️" : "🌙";
+    themeLabel.textContent = dark ? "light mode" : "dark mode";
+    themeBtn.setAttribute("aria-label", dark ? "라이트 모드로 전환" : "다크 모드로 전환");
   }
   var savedTheme = null;
   try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
