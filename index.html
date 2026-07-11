@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <title>2026 동북아 역사기행 준비 체크리스트</title>
 <style>
   :root {
@@ -93,6 +94,7 @@
     flex-direction: column;
     gap: var(--sp-3);
     padding-top: var(--sp-2);
+    position: relative;
   }
   .eyebrow {
     font-size: 0.75rem;
@@ -111,6 +113,8 @@
     line-height: 1.3;
     letter-spacing: -0.01em;
     text-wrap: balance;
+    word-break: keep-all;
+    padding-right: 50px;
   }
   .sub {
     margin: 0;
@@ -201,13 +205,18 @@
     background: transparent;
     color: var(--ink-soft);
     font-family: inherit;
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 9px 3px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 8px 2px;
     border-radius: 9px;
     cursor: pointer;
     white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
   }
+  .tab-ico { font-size: 1.15rem; line-height: 1; }
   .tab-btn[aria-selected="true"] {
     background: var(--surface);
     color: var(--ink);
@@ -490,18 +499,23 @@
   .linkout-btn:hover { filter: brightness(1.05); }
   .linkout-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .copy-row { display: flex; gap: 8px; margin-top: 10px; }
-  .copy-row input {
-    flex: 1; min-width: 0; border: 1px solid var(--line-strong); background: var(--surface-soft);
-    color: var(--ink-soft); border-radius: 10px; padding: 10px 12px; font-size: 0.78rem; font-family: inherit;
+  .theme-toggle {
+    position: absolute;
+    top: 4px;
+    right: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-size: 1.15rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+    padding: 0;
   }
-  .copy-row button {
-    flex: none; border: 1px solid var(--line-strong); background: var(--surface); color: var(--accent-ink);
-    font-family: inherit; font-weight: 700; font-size: 0.82rem; padding: 10px 16px; border-radius: 10px; cursor: pointer;
-    white-space: nowrap;
-  }
-  .copy-row button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .copy-hint { font-size: 0.74rem; color: var(--ink-faint); margin-top: 8px; line-height: 1.5; }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .roles-img { display:block; width:100%; height:auto; border-radius:10px; border:1px solid var(--line); cursor: zoom-in; }
   .roles-hint { text-align:center; font-size:0.75rem; color: var(--ink-faint); margin-top: 8px; }
@@ -531,6 +545,7 @@
 
 <div class="app">
   <div class="masthead">
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="다크 모드로 전환">🌙</button>
     <span class="eyebrow">✈️ 2026년 제27차 동북아 역사기행</span>
     <h1>민족의 뿌리를 찾아서 — 준비 체크리스트</h1>
     <p class="sub">8/8(토) 인천 출발 — 8/14(금) 인천 도착 · 6박 7일</p>
@@ -555,10 +570,10 @@
   </div>
 
   <div class="tabs" role="tablist">
-    <button class="tab-btn" role="tab" aria-selected="true" data-tab="pre">✅ 사전 체크</button>
-    <button class="tab-btn" role="tab" aria-selected="false" data-tab="pack">🎒 챙길 물품</button>
-    <button class="tab-btn" role="tab" aria-selected="false" data-tab="schedule">🗓️ 일정</button>
-    <button class="tab-btn" role="tab" aria-selected="false" data-tab="roles">🚌 역할표</button>
+    <button class="tab-btn" role="tab" aria-selected="true" data-tab="pre"><span class="tab-ico">✅</span><span>사전 체크</span></button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="pack"><span class="tab-ico">🎒</span><span>챙길 물품</span></button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="schedule"><span class="tab-ico">🗓️</span><span>일정</span></button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="roles"><span class="tab-ico">🚌</span><span>역할표</span></button>
   </div>
 
   <div class="panel active" id="panel-pre" data-checklist></div>
@@ -603,11 +618,6 @@
         <a class="linkout-btn" href="https://docs.google.com/spreadsheets/d/1z2xL9Fg2WobZ3Y_g9rZDwWcm5Zr2a6dGF_f-oNt-99o/edit?gid=0#gid=0" target="_blank" rel="noopener">
           📊 구글 시트에서 전체 역할배정표 보기(1~3호차 차량 전체) ↗
         </a>
-        <div class="copy-row">
-          <input type="text" id="sheetUrl" readonly value="https://docs.google.com/spreadsheets/d/1z2xL9Fg2WobZ3Y_g9rZDwWcm5Zr2a6dGF_f-oNt-99o/edit" aria-label="전체 역할배정표 링크" />
-          <button type="button" id="copySheetBtn">링크 복사</button>
-        </div>
-        <div class="copy-hint">위 버튼으로 시트가 열리지 않으면, 링크를 복사한 뒤 브라우저 주소창에 붙여넣어 주세요.</div>
       </div>
     </div>
   </div>
@@ -922,29 +932,29 @@
     });
   });
 
-  // 구글 시트 링크 복사 (샌드박스에서 새 탭 열기가 막힐 때의 대체 수단)
-  var copySheetBtn = document.getElementById("copySheetBtn");
-  var sheetUrl = document.getElementById("sheetUrl");
-  copySheetBtn.addEventListener("click", function () {
-    function done() {
-      copySheetBtn.textContent = "복사됨!";
-      setTimeout(function () { copySheetBtn.textContent = "링크 복사"; }, 1600);
-    }
-    function fallbackCopy() {
-      sheetUrl.focus();
-      sheetUrl.select();
-      sheetUrl.setSelectionRange(0, sheetUrl.value.length);
-      try { if (document.execCommand("copy")) done(); } catch (e) {}
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(sheetUrl.value).then(done, fallbackCopy);
-    } else {
-      fallbackCopy();
-    }
-  });
-  sheetUrl.addEventListener("click", function () {
-    sheetUrl.select();
-    sheetUrl.setSelectionRange(0, sheetUrl.value.length);
+  // 다크/라이트 테마 전환 (선택은 이 기기에 저장)
+  var THEME_KEY = "nk-trip-theme";
+  var themeBtn = document.getElementById("themeToggle");
+  function effectiveDark() {
+    var t = document.documentElement.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function refreshThemeBtn() {
+    themeBtn.textContent = effectiveDark() ? "☀️" : "🌙";
+    themeBtn.setAttribute("aria-label", effectiveDark() ? "라이트 모드로 전환" : "다크 모드로 전환");
+  }
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
+  if (savedTheme === "dark" || savedTheme === "light") {
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }
+  refreshThemeBtn();
+  themeBtn.addEventListener("click", function () {
+    var next = effectiveDark() ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    refreshThemeBtn();
   });
 
   // 차량 / 조 / 이름 persistence
