@@ -132,21 +132,31 @@
     box-shadow: var(--shadow);
   }
   .whoami input {
-    flex: 1;
     min-width: 0;
     border: 1px solid var(--line);
     background: var(--surface-soft);
     color: var(--ink);
     border-radius: 9px;
-    padding: 9px 10px;
+    padding: 9px 8px;
     font-size: 0.9rem;
     font-family: inherit;
+    text-align: center;
   }
   .whoami input:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
-  .whoami input.bus, .whoami input.group { flex: 0 0 60px; }
+  .whoami-field {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .whoami-field input { width: 46px; }
+  .whoami input.name { flex: 1; }
   .whoami-note {
     font-size: 0.75rem;
     color: var(--ink-faint);
@@ -527,10 +537,10 @@
     padding: 9px 18px; font-size:0.88rem; font-weight:600; font-family: inherit; cursor:pointer;
   }
   .lightbox-bar button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .lightbox-scroll { flex:1; overflow:auto; -webkit-overflow-scrolling: touch; }
-  .lightbox-scroll img { display:block; max-width:none; }
-  .lightbox-scroll img.fit { width:100%; height:auto; }
-  .lightbox-scroll img.full { width:2011px; height:auto; }
+  .lightbox-scroll { flex:1; overflow:auto; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
+  .lightbox-scroll img { display:block; max-width:none; height:auto; }
+  .lb-zoom-group { display:flex; align-items:center; gap:6px; }
+  #lbZoomPct { color:#fff; font-size:0.85rem; min-width:52px; text-align:center; font-variant-numeric: tabular-nums; }
 
   footer {
     text-align: center;
@@ -552,9 +562,9 @@
   </div>
 
   <div class="whoami">
-    <input type="text" id="busInput" class="bus" placeholder="차량" aria-label="차량" maxlength="6" />
-    <input type="text" id="groupInput" class="group" placeholder="조" aria-label="조" maxlength="6" />
-    <input type="text" id="nameInput" placeholder="이름" aria-label="이름" maxlength="20" />
+    <label class="whoami-field"><input type="text" id="busInput" inputmode="numeric" placeholder="－" aria-label="차량 번호" maxlength="2" /><span>호차</span></label>
+    <label class="whoami-field"><input type="text" id="groupInput" inputmode="numeric" placeholder="－" aria-label="조 번호" maxlength="2" /><span>조</span></label>
+    <input type="text" id="nameInput" class="name" placeholder="이름" aria-label="이름" maxlength="20" />
   </div>
 
   <div class="progress-card">
@@ -624,11 +634,15 @@
 
   <div class="lightbox" id="lightbox" role="dialog" aria-label="1호차 역할배정표 크게 보기">
     <div class="lightbox-bar">
-      <button type="button" id="lbZoom">전체 보기</button>
+      <div class="lb-zoom-group">
+        <button type="button" id="lbZoomOut" aria-label="축소">🔍−</button>
+        <span id="lbZoomPct">100%</span>
+        <button type="button" id="lbZoomIn" aria-label="확대">🔍＋</button>
+      </div>
       <button type="button" id="lbClose">닫기 ✕</button>
     </div>
     <div class="lightbox-scroll" id="lbScroll">
-      <img id="lbImg" class="full" alt="1호차 역할배정표 확대 이미지" />
+      <img id="lbImg" alt="1호차 역할배정표 확대 이미지" />
     </div>
   </div>
 
@@ -652,7 +666,8 @@
         { id: "exchange", label: "위안화 환전", note: "1인 700위안(약 15만원) + 기사·가이드 팁 150위안(약 3.2만원) 별도 준비. 흠집·낙서 있는 지폐는 사용 불가 · (선택) 알리페이·위챗페이 등 중국 모바일 QR 결제수단도 함께 준비하면 편리합니다." },
         { id: "sim", label: "유심(USIM) 또는 이심(eSIM) 구매·개통", note: "본인 휴대폰이 지원하는 방식인지 먼저 확인 후 출국 전 한국에서 준비 (구글·텔레그램·카카오톡 등 접속용)" },
         { id: "save-docs", label: "여권 정보면·e티켓 휴대폰에 저장", note: "여권 분실 시 재발급에 사용됩니다." },
-        { id: "gaode-map", label: "고덕지도(가오더맵) 다운로드", note: "(선택) 중국 현지에서 구글맵 대신 사용 가능한 지도 앱 · <a href=\"https://www.amap.com/\" target=\"_blank\" rel=\"noopener\">amap.com에서 다운로드</a>" }
+        { id: "gaode-map", label: "고덕지도(가오더맵) 다운로드", note: "(선택) 중국 현지에서 구글맵 대신 사용 가능한 지도 앱 · <a href=\"https://www.amap.com/\" target=\"_blank\" rel=\"noopener\">amap.com에서 다운로드</a>" },
+        { id: "edu-doc", label: "역사기행 교육자료 숙지", note: "<a href=\"https://docs.google.com/document/d/1QvTCNNKc0oSyzX1_b2ioV-knyaHc75Ll1clBpM-Okr8/edit?tab=t.0\" target=\"_blank\" rel=\"noopener\">1차 사전교육 자료집 열기</a> — 일정 · 생활수칙 · 준비물 안내" }
       ]
     },
     pack: {
@@ -961,21 +976,46 @@
   var busInput = document.getElementById("busInput");
   var groupInput = document.getElementById("groupInput");
   var nameInput = document.getElementById("nameInput");
-  busInput.value = state.bus || "";
-  groupInput.value = state.group || "";
+  busInput.value = (state.bus || "").replace(/\D/g, "");
+  groupInput.value = (state.group || "").replace(/\D/g, "");
   nameInput.value = state.name || "";
-  // 역할배정표 라이트박스
+  // 역할배정표 라이트박스 (버튼·핀치줌으로 배율 조절)
   var rolesImg = document.getElementById("rolesImg");
   var lightbox = document.getElementById("lightbox");
   var lbImg = document.getElementById("lbImg");
-  var lbZoom = document.getElementById("lbZoom");
+  var lbScroll = document.getElementById("lbScroll");
   var lbClose = document.getElementById("lbClose");
+  var lbZoomIn = document.getElementById("lbZoomIn");
+  var lbZoomOut = document.getElementById("lbZoomOut");
+  var lbZoomPct = document.getElementById("lbZoomPct");
+  var LB_MIN = 1, LB_MAX = 6;
+  var lbScale = 1; // 1 = 화면 폭에 맞춤
+
+  function lbApply() {
+    lbImg.style.width = Math.round(lbScroll.clientWidth * lbScale) + "px";
+    lbZoomPct.textContent = Math.round(lbScale * 100) + "%";
+  }
+  // (cx, cy): 확대 기준점 — 스크롤 영역 안에서의 화면 좌표
+  function lbSetScale(target, cx, cy) {
+    var next = Math.min(LB_MAX, Math.max(LB_MIN, target));
+    if (next === lbScale) return;
+    if (cx === undefined) { cx = lbScroll.clientWidth / 2; cy = lbScroll.clientHeight / 2; }
+    var contentX = lbScroll.scrollLeft + cx;
+    var contentY = lbScroll.scrollTop + cy;
+    var ratio = next / lbScale;
+    lbScale = next;
+    lbApply();
+    lbScroll.scrollLeft = contentX * ratio - cx;
+    lbScroll.scrollTop = contentY * ratio - cy;
+  }
   function openLightbox() {
     if (!lbImg.src) lbImg.src = rolesImg.src;
-    lbImg.className = "full";
-    lbZoom.textContent = "전체 보기";
     lightbox.classList.add("open");
     document.body.style.overflow = "hidden";
+    lbScale = 1;
+    lbApply();
+    lbScroll.scrollLeft = 0;
+    lbScroll.scrollTop = 0;
   }
   function closeLightbox() {
     lightbox.classList.remove("open");
@@ -983,17 +1023,59 @@
   }
   rolesImg.addEventListener("click", openLightbox);
   lbClose.addEventListener("click", closeLightbox);
-  lbZoom.addEventListener("click", function () {
-    var isFull = lbImg.className === "full";
-    lbImg.className = isFull ? "fit" : "full";
-    lbZoom.textContent = isFull ? "원본 크기" : "전체 보기";
-  });
+  lbZoomIn.addEventListener("click", function () { lbSetScale(lbScale * 1.4); });
+  lbZoomOut.addEventListener("click", function () { lbSetScale(lbScale / 1.4); });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
   });
 
-  busInput.addEventListener("input", function () { state.bus = busInput.value; saveState(); });
-  groupInput.addEventListener("input", function () { state.group = groupInput.value; saveState(); });
+  // 두 손가락 핀치줌
+  var pinch = null;
+  function touchDist(t) {
+    var dx = t[0].clientX - t[1].clientX;
+    var dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  lbScroll.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 2) {
+      pinch = { d: touchDist(e.touches), scale: lbScale };
+    }
+  }, { passive: true });
+  lbScroll.addEventListener("touchmove", function (e) {
+    if (pinch && e.touches.length === 2) {
+      e.preventDefault();
+      var rect = lbScroll.getBoundingClientRect();
+      var cx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+      var cy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+      lbSetScale(pinch.scale * (touchDist(e.touches) / pinch.d), cx, cy);
+    }
+  }, { passive: false });
+  lbScroll.addEventListener("touchend", function (e) {
+    if (e.touches.length < 2) pinch = null;
+  });
+  // 더블탭: 맞춤 ↔ 2.5배
+  var lastTap = 0;
+  lbImg.addEventListener("touchend", function (e) {
+    if (e.touches.length > 0) return;
+    var now = Date.now();
+    if (now - lastTap < 320) {
+      var rect = lbScroll.getBoundingClientRect();
+      var t = e.changedTouches[0];
+      lbSetScale(lbScale > 1.2 ? 1 : 2.5, t.clientX - rect.left, t.clientY - rect.top);
+    }
+    lastTap = now;
+  });
+
+  busInput.addEventListener("input", function () {
+    busInput.value = busInput.value.replace(/\D/g, "");
+    state.bus = busInput.value;
+    saveState();
+  });
+  groupInput.addEventListener("input", function () {
+    groupInput.value = groupInput.value.replace(/\D/g, "");
+    state.group = groupInput.value;
+    saveState();
+  });
   nameInput.addEventListener("input", function () { state.name = nameInput.value; saveState(); });
 })();
 </script>
