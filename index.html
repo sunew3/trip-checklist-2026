@@ -334,9 +334,13 @@
     font-size: 0.78rem;
     color: var(--ink-soft);
     margin-top: 2px;
-    line-height: 1.45;
+    line-height: 1.55;
   }
-  .item-note a { color: var(--accent-ink); }
+  .item-note a { color: var(--accent-ink); overflow-wrap: anywhere; }
+  .item-label, .item-note, .callout, .info-card p, .day-sites, .progress-copy .label {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
   .star {
     display: inline-block;
     margin-left: 5px;
@@ -600,7 +604,7 @@
     </svg>
     <div class="progress-copy">
       <div class="num" id="progressNum">0 / 0 완료</div>
-      <div class="label">사전 체크 + 챙길 물품 전체 기준 · 이 기기에만 저장됩니다</div>
+      <div class="label">사전 체크 + 챙길 물품 전체 기준<br>이 기기에만 저장됩니다</div>
     </div>
   </div>
 
@@ -685,19 +689,18 @@
       title: "📌 사전 체크",
       note: "출발 전 반드시 완료해야 하는 서류·행정 준비입니다.",
       items: [
-        { id: "insurance", label: "여행자 보험 가입", note: "여행기간에 맞춰 개인적으로 가입합니다. (예시 가입 사이트: <a href=\"https://direct.samsungfire.com/\" target=\"_blank\" rel=\"noopener\">삼성화재 다이렉트</a>)" },
-        { id: "china-entry", label: "중국 전자 입국 신고서 작성", note: "온라인: <a href=\"https://s.nia.gov.cn/ArrivalCardFillingPC/entry-registation-home\" target=\"_blank\" rel=\"noopener\">s.nia.gov.cn/ArrivalCardFillingPC</a> · 또는 출국 당일 기내에서 작성" },
-        { id: "passport-valid", label: "여권 유효기간 확인", note: "만료일이 2027-02-15 이전이면 재발급 필요 ★중요, 사증면 3장 이상 남아있어야 함" },
-        { id: "exchange", label: "위안화 환전", note: "1인 700위안(약 15만원) + 기사·가이드 팁 150위안(약 3.2만원) 별도 준비. 흠집·낙서 있는 지폐는 사용 불가 · (선택) 알리페이·위챗페이 등 중국 모바일 QR 결제수단도 함께 준비하면 편리합니다." },
-        { id: "sim", label: "유심(USIM) 또는 이심(eSIM) 구매·개통", note: "본인 휴대폰이 지원하는 방식인지 먼저 확인 후 출국 전 한국에서 준비 (구글·텔레그램·카카오톡 등 접속용)" },
-        { id: "save-docs", label: "여권 정보면·e티켓 휴대폰에 저장", note: "여권 분실 시 재발급에 사용됩니다." },
-        { id: "gaode-map", label: "고덕지도(가오더맵) 다운로드", note: "(선택) 중국 현지에서 구글맵 대신 사용 가능한 지도 앱 · <a href=\"https://www.amap.com/\" target=\"_blank\" rel=\"noopener\">amap.com에서 다운로드</a>" },
-        { id: "edu-doc", label: "역사기행 교육자료 숙지", note: "<a href=\"https://docs.google.com/document/d/1QvTCNNKc0oSyzX1_b2ioV-knyaHc75Ll1clBpM-Okr8/edit?tab=t.0\" target=\"_blank\" rel=\"noopener\">1차 사전교육 자료집 열기</a> — 일정 · 생활수칙 · 준비물 안내" }
+        { id: "insurance", label: "여행자 보험 가입", note: "여행기간에 맞춰 개인적으로 가입합니다<br>예시 가입 사이트: <a href=\"https://direct.samsungfire.com/\" target=\"_blank\" rel=\"noopener\">삼성화재 다이렉트</a>" },
+        { id: "china-entry", label: "중국 전자 입국 신고서 작성", note: "온라인 작성: <a href=\"https://s.nia.gov.cn/ArrivalCardFillingPC/entry-registation-home\" target=\"_blank\" rel=\"noopener\">중국 입국 신고서 사이트</a><br>또는 출국 당일 기내에서 작성" },
+        { id: "passport-valid", label: "여권 유효기간 확인", note: "만료일이 2027-02-15 이전이면 재발급 필요 ★중요<br>사증면 3장 이상 남아있어야 함" },
+        { id: "exchange", label: "위안화 환전", note: "1인 700위안(약 15만원) + 기사·가이드 팁 150위안(약 3.2만원)<br>흠집·낙서 있는 지폐는 사용 불가<br>(선택) 알리페이·위챗페이 등 모바일 QR 결제수단도 준비하면 편리합니다" },
+        { id: "sim", label: "유심(USIM) 또는 이심(eSIM) 구매·개통", note: "본인 휴대폰이 지원하는 방식인지 확인 후 출국 전 한국에서 구매<br>구글·텔레그램·카카오톡 등 접속용" },
+        { id: "save-docs", label: "여권 정보면·e티켓 휴대폰에 저장", note: "여권 분실 시 재발급에 사용됩니다" },
+        { id: "gaode-map", label: "고덕지도(가오더맵) 다운로드", note: "(선택) 중국 현지에서 구글맵 대신 사용 가능한 지도 앱<br><a href=\"https://www.amap.com/\" target=\"_blank\" rel=\"noopener\">amap.com에서 다운로드</a>" },
+        { id: "edu-doc", label: "역사기행 교육자료 숙지", note: "<a href=\"https://docs.google.com/document/d/1QvTCNNKc0oSyzX1_b2ioV-knyaHc75Ll1clBpM-Okr8/edit?tab=t.0\" target=\"_blank\" rel=\"noopener\">1차 사전교육 자료집 열기</a><br>일정 · 생활수칙 · 준비물 안내" }
       ]
     },
     pack: {
       title: "챙길 물품",
-      note: "★ 표시는 필수 확인 물품입니다.",
       groups: [
         {
           name: "🛂 서류 · 전자기기",
@@ -707,16 +710,16 @@
             { id: "phone", label: "휴대폰" },
             { id: "earphone-phone", label: "휴대폰 이어폰" },
             { id: "sim-item", label: "유심 또는 이심" },
-            { id: "battery", label: "휴대폰 보조배터리", note: "반드시 기내 휴대(수하물 금지). 12,000mAh 이상 또는 2개 초과 시 압수될 수 있음" }
+            { id: "battery", label: "휴대폰 보조배터리", note: "반드시 기내 휴대 (수하물 금지)<br>12,000mAh 이상 또는 2개 초과 시 압수될 수 있음" }
           ]
         },
         {
           name: "🧳 가방류",
           items: [
             { id: "carrier", label: "수하물용 캐리어", note: "21인치 이하 · 15kg 이하" },
-            { id: "backpack", label: "휴대용 배낭", note: "20L 내외 · 생수·교재·건전지4개·카메라·모자·휴지 등" },
+            { id: "backpack", label: "휴대용 배낭", note: "20L 내외 (일반 책가방 크기)<br>생수·교재·건전지 4개·모자·휴지 등을 넣어 다님" },
             { id: "subbag", label: "보조가방", note: "숙소↔강의실 이동 시 교재를 넣어 다님" },
-            { id: "tag", label: "짐택 3개", note: "이름(한글·영문)·집주소 기재 후 캐리어·배낭·보조가방에 부착" }
+            { id: "tag", label: "짐택 3개", note: "이름(한글·영문)과 집주소 기재<br>캐리어·배낭·보조가방에 부착" }
           ]
         },
         {
@@ -725,9 +728,9 @@
           items: [
             { id: "vest", label: "단체복 - 조끼", star: true },
             { id: "hat", label: "단체복 - 모자", star: true },
-            { id: "textbook", label: "역사기행 교재(자료집)", star: true, note: "표지에 조·이름 기재, 분실 시 재지급 안 됨" },
-            { id: "radio", label: "무전기(수신기)", star: true, note: "2차 사전교육 때 배부 — 분실·파손 시 본인 부담" },
-            { id: "radio-earphone", label: "수신기용 이어폰 2개", star: true, note: "마이크 없는 3.5mm 이어폰만 사용 가능 ★중요 (개인 준비)" },
+            { id: "textbook", label: "역사기행 교재(자료집)", star: true, note: "표지에 조·이름 기재<br>분실 시 재지급 안 됨" },
+            { id: "radio", label: "무전기(수신기)", star: true, note: "2차 사전교육 때 배부<br>분실·파손 시 본인 부담" },
+            { id: "radio-earphone", label: "수신기용 이어폰 2개", star: true, note: "마이크 없는 3.5mm 이어폰만 사용 가능 ★중요<br>개인이 2개 준비합니다" },
             { id: "nametag", label: "이름표", star: true, note: "조끼 왼쪽 가슴에 부착" },
             { id: "ribbon-bag", label: "가방리본", star: true, note: "캐리어 손잡이에 부착" },
             { id: "ribbon-hat", label: "모자리본", star: true }
@@ -736,7 +739,7 @@
         {
           name: "🔋 건전지",
           items: [
-            { id: "battery-aaa", label: "수신기용 AAA 알카라인 건전지 16개", star: true, note: "출발 당일 4개만 기내 휴대, 나머지는 수하물에 넣기" }
+            { id: "battery-aaa", label: "수신기용 AAA 알카라인 건전지 16개", star: true, note: "출발 당일 4개만 기내 휴대<br>나머지는 수하물에 넣기" }
           ]
         },
         {
@@ -748,7 +751,7 @@
             { id: "pants", label: "긴 바지" },
             { id: "underwear", label: "속옷" },
             { id: "umbrella", label: "우산" },
-            { id: "raincoat", label: "비옷", note: "백두산 정상은 번개 위험으로 우산 사용 불가 — 비옷 필수" }
+            { id: "raincoat", label: "비옷", note: "백두산 정상은 번개 위험으로 우산 사용 불가<br>비옷 필수" }
           ]
         },
         {
@@ -762,7 +765,7 @@
           name: "🧴 기타",
           items: [
             { id: "mask", label: "마스크(KF94)", note: "여유 있게 준비" },
-            { id: "medicine", label: "비상약품", note: "타이레놀·소화제·멀미약·연고·밴드·파스 등. 지병약(우울증·당뇨·고혈압 등)은 반드시 지참" },
+            { id: "medicine", label: "비상약품", note: "타이레놀·소화제·멀미약·연고·밴드·파스 등<br>지병약(당뇨·고혈압 등)은 반드시 지참 — 현지에서 구하기 어려움" },
             { id: "toiletries", label: "세면도구" },
             { id: "sun", label: "선글라스 · 선크림" },
             { id: "mosquito", label: "모기퇴치제(선택)" },
@@ -893,10 +896,6 @@
 
   function buildPack() {
     var panel = document.getElementById("panel-pack");
-    var top = document.createElement("p");
-    top.className = "schedule-note";
-    top.textContent = data.pack.note;
-    panel.appendChild(top);
     data.pack.groups.forEach(function (g) {
       var s = renderSection(g.name, g.items, g.note);
       panel.appendChild(s);
