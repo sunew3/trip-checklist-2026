@@ -820,11 +820,63 @@
     try {
       document.cookie = STORAGE_KEY + "=" + encodeURIComponent(json) + "; max-age=31536000; path=/; SameSite=Lax";
     } catch (e) {}
+    syncProgress();
   }
   // 브라우저에 영구 저장을 요청 — iOS 사파리의 '7일 미접속 시 저장소 삭제' 방지
   try {
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
   } catch (e) {}
+
+  // ---- 사용 현황 집계 (관리자 페이지용, 익명 기기 ID 기준) ----
+  var SB_URL = "https://sribivksnarymdkiuvya.supabase.co";
+  var SB_KEY = "sb_publishable_Y247k8sXWv0tALLNngvsjg_c50yYuIM";
+  var DEVICE_KEY = "nk-trip-device-id";
+  var deviceId = null;
+  try {
+    deviceId = localStorage.getItem(DEVICE_KEY);
+    if (!deviceId) {
+      deviceId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0;
+            return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+          });
+      localStorage.setItem(DEVICE_KEY, deviceId);
+    }
+  } catch (e) {}
+
+  function sbHeaders() {
+    return { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" };
+  }
+  // 방문 기록 (페이지 열 때 1회)
+  if (deviceId && window.fetch) {
+    fetch(SB_URL + "/rest/v1/trip_visits", {
+      method: "POST",
+      headers: sbHeaders(),
+      body: JSON.stringify({ device_id: deviceId })
+    }).catch(function () {});
+  }
+  // 진행 현황 동기화 (변경 후 1.5초 뒤 한 번에 전송)
+  var syncTimer = null;
+  function syncProgress() {
+    if (!deviceId || !window.fetch) return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(function () {
+      var checkedCount = 0;
+      for (var k in state.checked) { if (state.checked[k]) checkedCount++; }
+      fetch(SB_URL + "/rest/v1/rpc/trip_report_progress", {
+        method: "POST",
+        headers: sbHeaders(),
+        body: JSON.stringify({
+          p_device: deviceId,
+          p_bus: state.bus || "",
+          p_grp: state.group || "",
+          p_name: state.name || "",
+          p_checked: checkedCount,
+          p_total: ALL_IDS.length
+        })
+      }).catch(function () {});
+    }, 1500);
+  }
 
   function allItemIds() {
     var ids = data.pre.items.map(function (i) { return i.id; });
@@ -944,6 +996,7 @@
   buildPack();
   buildSchedule();
   refreshAll();
+  syncProgress();
 
   document.addEventListener("change", function (e) {
     if (e.target && e.target.matches("input[type=checkbox][data-id]")) {

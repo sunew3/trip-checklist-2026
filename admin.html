@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<title>역사기행 체크리스트 - 관리자</title>
+<style>
+  :root {
+    --bg: #fbf7f0; --surface: #ffffff; --surface-soft: #f8f2e7;
+    --ink: #3d3527; --ink-soft: #7a6f58; --ink-faint: #a2967e;
+    --accent: #ee8b2c; --accent-soft: #fdeed6; --accent-ink: #b0620e;
+    --good: #2f9e6e; --good-soft: #e0f4e9;
+    --line: #eee4d2; --line-strong: #dccfb4;
+    --shadow: 0 1px 2px rgba(120,90,40,0.06), 0 4px 14px rgba(120,90,40,0.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161f; --surface: #1b212e; --surface-soft: #212836;
+      --ink: #e8ecf3; --ink-soft: #9aa4b8; --ink-faint: #6c7688;
+      --accent: #f3a45c; --accent-soft: #40301b; --accent-ink: #ffcf9b;
+      --good: #5fc292; --good-soft: #1d3a2b;
+      --line: #2a3241; --line-strong: #384057;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.28);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+  .app { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 20px; }
+  .eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.08em; color: var(--accent-ink); background: var(--accent-soft);
+    display: inline-flex; width: fit-content; padding: 3px 10px; border-radius: 999px; font-weight: 600;
+  }
+  h1 { margin: 8px 0 0; font-size: 1.35rem; }
+  .keybox { display: flex; gap: 8px; }
+  .keybox input {
+    flex: 1; min-width: 0; border: 1px solid var(--line-strong); background: var(--surface);
+    color: var(--ink); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; font-family: inherit;
+  }
+  .keybox button, .refresh-btn {
+    border: 0; background: var(--accent); color: #fff; font-family: inherit; font-weight: 700;
+    font-size: 0.9rem; padding: 10px 18px; border-radius: 10px; cursor: pointer; white-space: nowrap;
+  }
+  .error { color: #c0392b; font-size: 0.85rem; }
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 560px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px; box-shadow: var(--shadow);
+  }
+  .tile .num { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .tile .lbl { font-size: 0.75rem; color: var(--ink-soft); margin-top: 2px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 10px; }
+  .card-head h2 { margin: 0; font-size: 0.95rem; }
+  .card-head .meta { font-size: 0.72rem; color: var(--ink-faint); }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { padding: 9px 12px; text-align: left; white-space: nowrap; }
+  th { font-size: 0.72rem; color: var(--ink-faint); font-weight: 600; border-bottom: 1px solid var(--line); }
+  td { border-bottom: 1px solid var(--line); }
+  tr:last-child td { border-bottom: 0; }
+  .noname { color: var(--ink-faint); }
+  .pbar { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+  .pbar .track { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .pbar .fill { display: block; height: 100%; background: var(--accent); }
+  .pbar .fill.done { background: var(--good); }
+  .pbar .pct { font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--ink-soft); width: 62px; text-align: right; }
+  .time { color: var(--ink-faint); font-size: 0.75rem; }
+  footer { text-align: center; font-size: 0.72rem; color: var(--ink-faint); }
+  footer a { color: var(--accent-ink); }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div>
+    <span class="eyebrow">🛠 관리자 페이지</span>
+    <h1>역사기행 체크리스트 사용 현황</h1>
+  </div>
+
+  <div class="keybox" id="keybox">
+    <input type="password" id="keyInput" placeholder="관리자 키 입력" aria-label="관리자 키" />
+    <button type="button" id="keyBtn">확인</button>
+  </div>
+  <div class="error hidden" id="errorMsg"></div>
+
+  <div class="hidden" id="dashboard">
+    <div class="tiles" style="margin-bottom: 20px;">
+      <div class="tile"><div class="num" id="tVisitsToday">-</div><div class="lbl">오늘 방문</div></div>
+      <div class="tile"><div class="num" id="tVisitsTotal">-</div><div class="lbl">누적 방문</div></div>
+      <div class="tile"><div class="num" id="tDevices">-</div><div class="lbl">접속 기기</div></div>
+      <div class="tile"><div class="num" id="tNamed">-</div><div class="lbl">이름 입력 참가자</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>참가자별 진행 현황</h2>
+        <span class="meta" id="lastRefresh"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>차량</th><th>조</th><th>이름</th><th>진행률</th><th>마지막 사용</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top: 14px;">
+      <button type="button" class="refresh-btn" id="refreshBtn">새로고침</button>
+    </div>
+  </div>
+
+  <footer><a href="./">← 체크리스트로 돌아가기</a> · 1분마다 자동 새로고침</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var SB_URL = "https://sribivksnarymdkiuvya.supabase.co";
+  var SB_KEY = "sb_publishable_Y247k8sXWv0tALLNngvsjg_c50yYuIM";
+  var ADMIN_KEY_STORE = "nk-trip-admin-key";
+
+  var keybox = document.getElementById("keybox");
+  var keyInput = document.getElementById("keyInput");
+  var keyBtn = document.getElementById("keyBtn");
+  var errorMsg = document.getElementById("errorMsg");
+  var dashboard = document.getElementById("dashboard");
+  var tbody = document.getElementById("tbody");
+
+  function getKey() {
+    var m = location.search.match(/[?&]key=([^&]+)/);
+    if (m) return decodeURIComponent(m[1]);
+    try { return localStorage.getItem(ADMIN_KEY_STORE) || ""; } catch (e) { return ""; }
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    var now = new Date();
+    var diff = (now - d) / 60000;
+    if (diff < 1) return "방금 전";
+    if (diff < 60) return Math.floor(diff) + "분 전";
+    if (diff < 1440) return Math.floor(diff / 60) + "시간 전";
+    return (d.getMonth() + 1) + "/" + d.getDate() + " " +
+           ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function load(key) {
+    errorMsg.classList.add("hidden");
+    fetch(SB_URL + "/rest/v1/rpc/trip_admin_stats", {
+      method: "POST",
+      headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_key: key })
+    }).then(function (r) {
+      if (!r.ok) throw new Error("invalid");
+      return r.json();
+    }).then(function (s) {
+      try { localStorage.setItem(ADMIN_KEY_STORE, key); } catch (e) {}
+      keybox.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      document.getElementById("tVisitsToday").textContent = s.visits_today;
+      document.getElementById("tVisitsTotal").textContent = s.visits_total;
+      document.getElementById("tDevices").textContent = s.total_devices;
+      document.getElementById("tNamed").textContent = s.named_participants;
+      var rows = (s.participants || []).map(function (p) {
+        var pct = p.total_count ? Math.round(p.checked_count / p.total_count * 100) : 0;
+        var nameCell = p.name ? esc(p.name) : '<span class="noname">(이름 미입력)</span>';
+        return "<tr>" +
+          "<td>" + (p.bus ? esc(p.bus) + "호차" : "-") + "</td>" +
+          "<td>" + (p.grp ? esc(p.grp) + "조" : "-") + "</td>" +
+          "<td>" + nameCell + "</td>" +
+          '<td><div class="pbar"><span class="track"><span class="fill' + (pct === 100 ? " done" : "") + '" style="width:' + pct + '%"></span></span><span class="pct">' + p.checked_count + "/" + p.total_count + "</span></div></td>" +
+          '<td class="time">' + fmtTime(p.updated_at) + "</td>" +
+          "</tr>";
+      });
+      tbody.innerHTML = rows.join("") || '<tr><td colspan="5" class="noname">아직 데이터가 없습니다</td></tr>';
+      document.getElementById("lastRefresh").textContent =
+        "갱신: " + new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    }).catch(function () {
+      errorMsg.textContent = "키가 올바르지 않거나 서버에 연결할 수 없습니다.";
+      errorMsg.classList.remove("hidden");
+      keybox.classList.remove("hidden");
+      dashboard.classList.add("hidden");
+      try { localStorage.removeItem(ADMIN_KEY_STORE); } catch (e) {}
+    });
+  }
+
+  keyBtn.addEventListener("click", function () { if (keyInput.value.trim()) load(keyInput.value.trim()); });
+  keyInput.addEventListener("keydown", function (e) { if (e.key === "Enter" && keyInput.value.trim()) load(keyInput.value.trim()); });
+  document.getElementById("refreshBtn").addEventListener("click", function () { load(getKey()); });
+
+  var initial = getKey();
+  if (initial) load(initial);
+
+  setInterval(function () {
+    if (!dashboard.classList.contains("hidden")) load(getKey());
+  }, 60000);
+})();
+</script>
+</body>
+</html>
