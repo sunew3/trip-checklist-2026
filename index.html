@@ -871,13 +871,25 @@
   function sbHeaders() {
     return { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" };
   }
-  // 방문 기록 (페이지 열 때 1회)
+  // 방문 기록 (같은 기기는 하루 1회만 — 새로고침해도 중복 집계 안 됨)
   if (deviceId && window.fetch) {
-    fetch(SB_URL + "/rest/v1/trip_visits", {
-      method: "POST",
-      headers: sbHeaders(),
-      body: JSON.stringify({ device_id: deviceId })
-    }).catch(function () {});
+    var VISIT_KEY = "nk-trip-last-visit";
+    var todayKST;
+    try {
+      todayKST = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+    } catch (e) {
+      todayKST = new Date().toISOString().slice(0, 10);
+    }
+    var lastVisit = null;
+    try { lastVisit = localStorage.getItem(VISIT_KEY); } catch (e) {}
+    if (lastVisit !== todayKST) {
+      try { localStorage.setItem(VISIT_KEY, todayKST); } catch (e) {}
+      fetch(SB_URL + "/rest/v1/trip_visits", {
+        method: "POST",
+        headers: sbHeaders(),
+        body: JSON.stringify({ device_id: deviceId })
+      }).catch(function () {});
+    }
   }
   // 진행 현황 동기화 (변경 후 1.5초 뒤 한 번에 전송)
   var syncTimer = null;
