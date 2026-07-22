@@ -386,10 +386,20 @@
   }
   .item-del:hover { color: #c0392b; background: var(--surface-soft); }
   .item-del:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .custom-empty {
-    font-size: 0.8rem;
+  .custom-guide {
+    font-size: 0.75rem;
     color: var(--ink-faint);
-    padding: 10px var(--sp-2) 4px;
+    padding: 10px var(--sp-4) 0;
+    line-height: 1.5;
+  }
+  .sample-item { opacity: 0.6; cursor: default; }
+  .sample-item:hover { background: transparent; }
+  .sample-box { border-style: dashed; }
+  .sample-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+    margin-left: 5px;
   }
   .add-row { display: flex; gap: 8px; padding: 0 var(--sp-4) var(--sp-4); }
   .add-row input {
@@ -1056,6 +1066,7 @@
       '<div class="section-head"><h2>✏️ 내가 추가한 항목</h2>' +
       '<span class="section-count" data-count></span></div>' +
       '<div class="bar"><span data-bar></span></div>' +
+      '<div class="custom-guide">개인적으로 필요한 항목을 추가해보세요</div>' +
       '<div class="item-list" data-custom-list></div>' +
       '<div class="add-row">' +
       '<input type="text" id="customInput" placeholder="직접 챙길 물품 입력" aria-label="추가할 항목" maxlength="40" />' +
@@ -1067,13 +1078,13 @@
 
     function renderList() {
       list.innerHTML = "";
-      if (!state.custom.length) {
-        var empty = document.createElement("div");
-        empty.className = "custom-empty";
-        empty.textContent = "필요한 준비물을 직접 추가해 보세요";
-        list.appendChild(empty);
-        return;
-      }
+      var sample = document.createElement("div");
+      sample.className = "item sample-item";
+      sample.innerHTML =
+        '<span class="box sample-box"></span>' +
+        '<span class="item-text"><span class="item-label">카메라' +
+        '<span class="sample-tag">(예시)</span></span></span>';
+      list.appendChild(sample);
       state.custom.forEach(function (c) {
         var row = document.createElement("div");
         row.className = "item-row";
