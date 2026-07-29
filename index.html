@@ -20,6 +20,7 @@
 <meta name="theme-color" content="#ee8b2c">
 <meta name="apple-mobile-web-app-title" content="역사기행">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script>window.APP_VERSION="61af436da3";</script>
 <title>2026 동북아 역사기행 준비 체크리스트</title>
 <style>
   :root {
@@ -763,6 +764,21 @@
 <script>
 (function () {
   "use strict";
+
+  // 최신 버전 자동 감지 — 캐시된 예전 페이지를 열었으면 최신본으로 강제 이동
+  (function () {
+    if (!window.fetch) return;
+    var mine = window.APP_VERSION || "";
+    if (!mine) return;
+    fetch("version.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (v) {
+        if (v && v.version && v.version !== mine && !/[?&]v=/.test(location.search)) {
+          location.replace(location.pathname + "?v=" + encodeURIComponent(v.version));
+        }
+      })
+      .catch(function () {});
+  })();
 
   var STORAGE_KEY = "nk-history-trip-checklist-v1";
 
