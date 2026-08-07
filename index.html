@@ -20,7 +20,7 @@
 <meta name="theme-color" content="#ee8b2c">
 <meta name="apple-mobile-web-app-title" content="역사기행">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<script>window.APP_VERSION="f245121901";</script>
+<script>window.APP_VERSION="bf525f1ac6";</script>
 <title>2026 동북아 역사기행 준비 체크리스트</title>
 <style>
   :root {
@@ -575,6 +575,8 @@
     color: var(--accent-ink);
   }
   details.pack-tips[open] summary::after { transform: rotate(180deg); }
+  .tips-cta { font-size: 0.72rem; font-weight: 500; color: var(--ink-soft); }
+  details.pack-tips[open] .tips-cta { display: none; }
   .pack-tips ol {
     margin: var(--sp-3) 0 0;
     padding-left: 1.3em;
@@ -1110,11 +1112,11 @@
 
     var tips = document.createElement("details");
     tips.className = "pack-tips";
-    tips.setAttribute("open", "");
     var ol = "<ol>";
     packTips.forEach(function (t) { ol += "<li>" + t + "</li>"; });
     ol += "</ol>";
-    tips.innerHTML = "<summary>⚠️ 짐 쌀 때 주의사항</summary>" + ol;
+    tips.innerHTML =
+      '<summary>⚠️ 짐 쌀 때 주의사항 <span class="tips-cta">(클릭해서 전체 읽기)</span></summary>' + ol;
     panel.appendChild(tips);
 
     data.pack.groups.forEach(function (g) {
